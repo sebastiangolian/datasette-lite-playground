@@ -36,21 +36,24 @@ Self-hosted limitations: `?ref=<branch|commit>` and plugins installed from GitHu
 Simon's CORS proxy, which only allows lite.datasette.io — PyPI versions and plugins work fine.
 Data lives in the tab only; nothing persists across reloads.
 
-## Running locally
+## Makefile
 
 ```bash
-mkdir -p site/data site/lite
-cp index.html site/ && cp data/* site/data/
-python3 scripts/build_db.py site/data/poland.db
-# copy index.html, shell.js, sw.js, webworker.js from simonw/datasette-lite into site/lite/
-cd site && python3 -m http.server 8009
+make build       # build site/ (data, poland.db, self-hosted Datasette Lite at the pinned commit)
+make serve       # build and serve on http://localhost:8009/ (PORT=... to change)
+make test-local  # serve site/ locally and check the 9 self-hosted scenarios
+make test-live   # check all 18 scenario links (both hosts) on the deployed GitHub Pages site
+make clean       # remove site/ and .venv/
 ```
 
-Open http://localhost:8009/ (localhost is a secure context, so the service worker works).
-Note that lite.datasette.io cannot load data from `http://localhost` — use the `./lite/` copy.
+Tests (`tests/check_scenarios.py`) open each scenario link from the landing page in headless
+Google Chrome via Playwright (installed into `.venv/` from `requirements-dev.txt`) and wait for
+the expected data to render inside the Datasette iframe. `test-local` skips the
+lite.datasette.io links: an HTTPS page cannot load data from `http://localhost`.
 
 ## Deploy
 
-Every push to `main` runs `.github/workflows/deploy-pages.yml`, which builds the site and
+Every push to `main` runs `.github/workflows/deploy-pages.yml`, which builds the site with
+`make build` and
 deploys it with `actions/deploy-pages`. To update the self-hosted Datasette Lite, bump
 `DATASETTE_LITE_REF`.
