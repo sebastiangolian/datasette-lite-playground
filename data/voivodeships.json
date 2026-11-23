@@ -1,0 +1,18 @@
+[
+  {"name": "dolnośląskie", "capital": "Wrocław", "area_km2": 19947},
+  {"name": "kujawsko-pomorskie", "capital": "Bydgoszcz / Toruń", "area_km2": 17972},
+  {"name": "lubelskie", "capital": "Lublin", "area_km2": 25122},
+  {"name": "lubuskie", "capital": "Gorzów Wielkopolski / Zielona Góra", "area_km2": 13988},
+  {"name": "łódzkie", "capital": "Łódź", "area_km2": 18219},
+  {"name": "małopolskie", "capital": "Kraków", "area_km2": 15183},
+  {"name": "mazowieckie", "capital": "Warszawa", "area_km2": 35558},
+  {"name": "opolskie", "capital": "Opole", "area_km2": 9412},
+  {"name": "podkarpackie", "capital": "Rzeszów", "area_km2": 17846},
+  {"name": "podlaskie", "capital": "Białystok", "area_km2": 20187},
+  {"name": "pomorskie", "capital": "Gdańsk", "area_km2": 18310},
+  {"name": "śląskie", "capital": "Katowice", "area_km2": 12333},
+  {"name": "świętokrzyskie", "capital": "Kielce", "area_km2": 11711},
+  {"name": "warmińsko-mazurskie", "capital": "Olsztyn", "area_km2": 24173},
+  {"name": "wielkopolskie", "capital": "Poznań", "area_km2": 29826},
+  {"name": "zachodniopomorskie", "capital": "Szczecin", "area_km2": 22892}
+]

@@ -1,0 +1,24 @@
+id,name,voivodeship,population,latitude,longitude
+1,Warszawa,mazowieckie,1861975,52.2297,21.0122
+2,Kraków,małopolskie,803282,50.0647,19.9450
+3,Wrocław,dolnośląskie,674132,51.1079,17.0385
+4,Łódź,łódzkie,655279,51.7592,19.4560
+5,Poznań,wielkopolskie,541316,52.4064,16.9252
+6,Gdańsk,pomorskie,486345,54.3520,18.6466
+7,Szczecin,zachodniopomorskie,391566,53.4285,14.5528
+8,Lublin,lubelskie,333391,51.2465,22.5684
+9,Bydgoszcz,kujawsko-pomorskie,330038,53.1235,18.0084
+10,Białystok,podlaskie,292600,53.1325,23.1688
+11,Katowice,śląskie,279190,50.2649,19.0238
+12,Gdynia,pomorskie,243918,54.5189,18.5305
+13,Częstochowa,śląskie,207506,50.8118,19.1203
+14,Rzeszów,podkarpackie,198609,50.0412,21.9991
+15,Radom,mazowieckie,197848,51.4027,21.1471
+16,Toruń,kujawsko-pomorskie,195194,53.0138,18.5984
+17,Sosnowiec,śląskie,192800,50.2863,19.1041
+18,Kielce,świętokrzyskie,183555,50.8661,20.6286
+19,Gliwice,śląskie,175102,50.2945,18.6714
+20,Olsztyn,warmińsko-mazurskie,169793,53.7784,20.4801
+21,Zielona Góra,lubuskie,139330,51.9356,15.5062
+22,Opole,opolskie,127387,50.6751,17.9213
+23,Gorzów Wielkopolski,lubuskie,119304,52.7368,15.2288

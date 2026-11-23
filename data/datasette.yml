@@ -1,0 +1,20 @@
+# Datasette 1.0 config (?config=), canned queries live here rather than in metadata.
+databases:
+  poland:
+    queries:
+      population_by_voivodeship:
+        title: Population by voivodeship
+        sql: |-
+          select v.name as voivodeship, v.capital, v.area_km2,
+                 count(c.id) as cities, coalesce(sum(c.population), 0) as population
+          from voivodeships v
+          left join cities c on c.voivodeship = v.name
+          group by v.name
+          order by population desc
+      cities_above:
+        title: Cities above a population threshold
+        sql: |-
+          select name, voivodeship, population
+          from cities
+          where population >= :min_population
+          order by population desc

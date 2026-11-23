@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datasette Lite playground</title>
+<style>
+:root {
+  --bg: #f7f7f5;
+  --card: #ffffff;
+  --text: #1d1d1b;
+  --muted: #5f5f5a;
+  --border: #e2e2dc;
+  --accent: #2557d6;
+  --accent-text: #ffffff;
+  --code-bg: #f0f0ec;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161615;
+    --card: #20201e;
+    --text: #ececea;
+    --muted: #a3a39e;
+    --border: #34342f;
+    --accent: #6d93ff;
+    --accent-text: #0d0d0c;
+    --code-bg: #2a2a27;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { margin: 0 0 4px; font-size: 26px; }
+.lead { color: var(--muted); margin: 0 0 24px; }
+.files { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.files a {
+  font: 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 3px 8px; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); text-decoration: none; background: var(--card);
+}
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.card h2 { margin: 0; font-size: 16px; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; flex: 1; }
+.card code {
+  display: block; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--code-bg); padding: 6px 8px; border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions a {
+  flex: 1; text-align: center; padding: 7px 10px; border-radius: 7px;
+  text-decoration: none; font-weight: 600; font-size: 13px;
+}
+.actions a.primary { background: var(--accent); color: var(--accent-text); }
+.actions a.secondary { border: 1px solid var(--accent); color: var(--accent); }
+footer { margin-top: 32px; color: var(--muted); font-size: 13px; }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Datasette Lite playground</h1>
+  <p class="lead">
+    Test scenarios for <a href="https://simonwillison.net/2026/Nov/17/datasette-lite/">Datasette Lite</a>
+    (Datasette running fully in the browser via Pyodide + a service worker).
+    The data files below are served from this GitHub Pages site, which sends
+    <code>Access-Control-Allow-Origin: *</code>, so Datasette Lite can fetch them.
+    Each scenario opens either on <strong>lite.datasette.io</strong> or on the
+    <strong>self-hosted copy</strong> deployed next to this page under <code>./lite/</code>.
+  </p>
+
+  <div class="files" id="files"></div>
+  <div class="grid" id="scenarios"></div>
+
+  <footer>
+    Self-hosted copy: pinned commit of
+    <a href="https://github.com/simonw/datasette-lite">simonw/datasette-lite</a>, analytics removed.
+    <code>?ref=&lt;branch|commit&gt;</code> and plugins installed from GitHub do not work there
+    (they go through a CORS proxy that only allows lite.datasette.io); PyPI versions and plugins do.
+  </footer>
+</main>
+
+<script>
+// Absolute base URL of this page's directory - Datasette Lite needs full URLs.
+const BASE = new URL("./", location.href).href;
+const data = (file) => BASE + "data/" + file;
+
+const FILES = ["poland.db", "cities.csv", "voivodeships.json", "schema.sql", "metadata.yml", "datasette.yml"];
+
+// Each scenario: query params (array of [key, value], keys may repeat) + optional
+// Datasette path that goes into the URL fragment.
+const SCENARIOS = [
+  {
+    title: "SQLite database + metadata + config",
+    description: "Load poland.db with titles/descriptions from metadata.yml and canned queries from datasette.yml.",
+    params: [["url", data("poland.db")], ["metadata", data("metadata.yml")], ["config", data("datasette.yml")]],
+    path: "/poland",
+  },
+  {
+    title: "Canned query with a parameter",
+    description: "Run the cities_above canned query with :min_population = 300000.",
+    params: [["url", data("poland.db")], ["config", data("datasette.yml")]],
+    path: "/poland/cities_above?min_population=300000",
+  },
+  {
+    title: "Facets and sorting via URL",
+    description: "Table view facetted by voivodeship, sorted by population descending.",
+    params: [["url", data("poland.db")]],
+    path: "/poland/cities?_facet=voivodeship&_sort_desc=population",
+  },
+  {
+    title: "Plain CSV import",
+    description: "Import cities.csv directly - every column becomes TEXT.",
+    params: [["csv", data("cities.csv")]],
+  },
+  {
+    title: "SQL schema, then CSV",
+    description: "schema.sql creates a typed cities table first, the CSV rows are loaded into it.",
+    params: [["sql", data("schema.sql")], ["csv", data("cities.csv")]],
+  },
+  {
+    title: "JSON import",
+    description: "Load voivodeships.json (array of objects) as a table.",
+    params: [["json", data("voivodeships.json")]],
+  },
+  {
+    title: "Plugin: datasette-cluster-map",
+    description: "Install a JavaScript visualisation plugin from PyPI - latitude/longitude columns render on a map.",
+    params: [["install", "datasette-cluster-map"], ["url", data("poland.db")]],
+    path: "/poland/cities",
+  },
+  {
+    title: "Pinned Datasette + SQLite version",
+    description: "Latest stable Datasette from PyPI with SQLite 3.54.1 - check the versions page.",
+    params: [["ref", "stable"], ["sqlite", "3.54.1"], ["url", data("poland.db")]],
+    path: "/-/versions",
+  },
+  {
+    title: "Writes as root: datasette-write",
+    description: "Sign in as root and run INSERT/UPDATE statements. Changes live only in this tab.",
+    params: [["root", "1"], ["install", "datasette-write"], ["url", data("poland.db")]],
+    path: "/-/write?database=poland",
+  },
+];
+
+function buildUrl(host, scenario) {
+  const query = new URLSearchParams(scenario.params).toString();
+  return host + "?" + query + (scenario.path ? "#" + scenario.path : "");
+}
+
+function el(tag, attrs = {}, text) {
+  const node = document.createElement(tag);
+  Object.assign(node, attrs);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+const files = document.getElementById("files");
+for (const file of FILES) {
+  files.append(el("a", { href: data(file) }, file));
+}
+
+const grid = document.getElementById("scenarios");
+for (const scenario of SCENARIOS) {
+  const card = el("article", { className: "card" });
+  card.append(el("h2", {}, scenario.title));
+  card.append(el("p", {}, scenario.description));
+  const summary = scenario.params.map(([k, v]) => `${k}=${v.replace(BASE, "./")}`).join("&");
+  card.append(el("code", {}, "?" + summary + (scenario.path ? "#" + scenario.path : "")));
+  const actions = el("div", { className: "actions" });
+  actions.append(el("a", { className: "primary", href: buildUrl("https://lite.datasette.io/", scenario) }, "lite.datasette.io"));
+  actions.append(el("a", { className: "secondary", href: buildUrl(BASE + "lite/", scenario) }, "Self-hosted"));
+  card.append(actions);
+  grid.append(card);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+title: Datasette Lite playground
+description: Largest Polish cities and the 16 voivodeships - sample data for testing Datasette Lite.
+license: CC0
+source: Approximate figures (GUS, 2023), for testing only
+databases:
+  poland:
+    description: SQLite database built by scripts/build_db.py from data/cities.csv and data/voivodeships.json.
+    tables:
+      cities:
+        description: Cities with population and coordinates (lat/lon columns are picked up by datasette-cluster-map).
+      voivodeships:
+        description: Voivodeships with their capitals and area.

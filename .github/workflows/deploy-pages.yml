@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # Pinned commit of simonw/datasette-lite served under ./lite/ - bump to update.
+  DATASETTE_LITE_REF: a20740d060344ff3a5a0ea5a9dd7e1e157323441
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare site directory
+        run: |
+          mkdir -p site/data site/lite
+          cp index.html site/
+          cp data/* site/data/
+          python3 scripts/build_db.py site/data/poland.db
+
+      - name: Add self-hosted Datasette Lite
+        run: |
+          curl -sSL "https://github.com/simonw/datasette-lite/archive/${DATASETTE_LITE_REF}.tar.gz" \
+            | tar -xz --strip-components=1 -C site/lite \
+              "datasette-lite-${DATASETTE_LITE_REF}/index.html" \
+              "datasette-lite-${DATASETTE_LITE_REF}/shell.js" \
+              "datasette-lite-${DATASETTE_LITE_REF}/sw.js" \
+              "datasette-lite-${DATASETTE_LITE_REF}/webworker.js"
+          # Drop Plausible analytics - it reports to the lite.datasette.io domain.
+          sed -i '/plausible/d' site/lite/index.html
+          ls -la site site/data site/lite
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
